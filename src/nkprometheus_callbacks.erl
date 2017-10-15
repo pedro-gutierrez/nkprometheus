@@ -23,7 +23,7 @@
 plugin_deps() -> [nkservice_rest].
 
 nkservice_rest_http(get, Path, Req) ->
-    lager:debug("NkPrometheus Rest handler Path: ~p, Req: ~p", [Path, Req]),
+    io:format("NkPrometheus Rest handler Path: ~p, Req: ~p~n", [Path, Req]),
     {http, 200, [{<<"content-type">>, <<"text/plain">>}], <<"nkprometheus test">>};
 
 nkservice_rest_http(_Method, _Path, _Req) ->
