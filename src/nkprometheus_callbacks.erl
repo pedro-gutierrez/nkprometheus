@@ -18,13 +18,13 @@
 %%
 %% -------------------------------------------------------------------
 -module(nkprometheus_callbacks).
--export([plugin_deps/0, nkservice_rest_http/5]).
+-export([plugin_deps/0, nkservice_rest_http/4]).
 
 plugin_deps() -> [nkservice_rest].
 
-nkservice_rest_http(SrvId, get, Path, _Req, State) ->
-    lager:debug("NkPrometheus Rest handler SrvId: ~p, Path: ~p, State: ~p", [SrvId, Path, State]),
+nkservice_rest_http(get, Path, _Req, State) ->
+    lager:debug("NkPrometheus Rest handler Path: ~p, State: ~p", [Path, State]),
     {http, 200, [{<<"content-type">>, <<"text/plain">>}], <<"nkprometheus test">>, State};
 
-nkservice_rest_http(_SrvId, _Method, _Path, _Req, _State) ->
+nkservice_rest_http(_Method, _Path, _Req, _State) ->
     continue.
