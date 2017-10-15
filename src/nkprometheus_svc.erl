@@ -60,6 +60,6 @@ exporters() ->
     %nkprometheus_app:get(exporters).
     [#{id => nkprometheus_default,
         listen_ip => <<"0.0.0.0">>,
-      listen_port => 9300,
+      listen_port => 9700,
       listen_path => <<"/metrics">>,
       listen_secure => false }].
