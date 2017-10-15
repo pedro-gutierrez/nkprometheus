@@ -58,7 +58,7 @@ rest_url(#{listen_ip := Host,
 
 exporters() ->
     %nkprometheus_app:get(exporters).
-    [#{id => nkprometheus_default,
+    [#{id => nkprometheus_callbacks,
         listen_ip => <<"0.0.0.0">>,
       listen_port => 9700,
       listen_path => <<"/metrics">>,
