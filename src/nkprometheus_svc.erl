@@ -38,11 +38,13 @@ start_exporter(#{ id := SrvId } = Spec) ->
     end.
 
 make_service_spec() ->
-    lists:map(fun(Exporter) ->
-                      Exporter#{
-                        callback => nkprometheus_callbacks,
-                        debug => [],
-                        rest_url => rest_url(Exporter)
+    lists:map(fun(#{ id := SrvId} = Exporter) ->
+                      #{ id => SrvId,
+                         name => SrvId,
+                         class => nkprometheus,
+                         callback => nkprometheus_callbacks,
+                         debug => [],
+                         rest_url => rest_url(Exporter)
                        }
               end, exporters()).
 
@@ -56,7 +58,8 @@ rest_url(#{listen_ip := Host,
 
 exporters() ->
     %nkprometheus_app:get(exporters).
-    [#{listen_ip => <<"0.0.0.0">>,
+    [#{id => nkprometheus_default,
+        listen_ip => <<"0.0.0.0">>,
       listen_port => 9300,
       listen_path => <<"/metrics">>,
       listen_secure => false }].
