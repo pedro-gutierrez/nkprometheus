@@ -43,7 +43,7 @@ make_service_spec() ->
                          name => SrvId,
                          class => nkprometheus,
                          callback => nkprometheus_callbacks,
-                         debug => [],
+                         debug => [nkservice_rest],
                          rest_url => rest_url(Exporter)
                        }
               end, exporters()).
