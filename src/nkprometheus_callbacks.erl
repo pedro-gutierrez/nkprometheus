@@ -22,9 +22,9 @@
 
 plugin_deps() -> [nkservice_rest].
 
-nkservice_rest_http(get, Path, Req) ->
-    io:format("NkPrometheus Rest handler Path: ~p, Req: ~p~n", [Path, Req]),
-    {http, 200, [{<<"content-type">>, <<"text/plain">>}], <<"nkprometheus test">>};
+nkservice_rest_http(get, _, _) ->
+    Scrape = prometheus_text_format:format(),
+    {http, 200, [{<<"content-type">>, <<"text/plain">>}], Scrape};
 
 nkservice_rest_http(_Method, _Path, _Req) ->
     continue.
