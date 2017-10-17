@@ -19,7 +19,6 @@
 %% -------------------------------------------------------------------
 -module(nkprometheus_svc).
 -export([start_services/1]).
--define(SRV, nkprometheus).
 
 start_services(_) ->
     Exporter = make_service_spec(),
@@ -37,13 +36,16 @@ start_exporter(#{ id := SrvId } = Spec) ->
             error(service_start_error)
     end.
 
+app_config(Key, Default) ->
+    application:get_env(Key, Default).
+
 make_service_spec() ->
-    #{ id => ?SRV, 
+    #{ id => nkprometheus, 
        callback => nkprometheus_callbacks,
-       rest_url => rest_url(nkprometheus_app:get(listen_ip, <<"0.0.0.0">>),
-                            nkprometheus_app:get(listen_port, 8081),
-                            nkprometheus_app:get(listen_path, <<"/metrics">>),
-                            nkprometheus_app:get(listen_secure, false)),
+       rest_url => rest_url(app_config(listen_ip, <<"0.0.0.0">>),
+                            app_config(listen_port, 8081),
+                            app_config(listen_path, <<"/metrics">>),
+                            app_config(listen_secure, false)),
        debug => []}.
 
 rest_url(Host, Port, Path, Secure) ->
