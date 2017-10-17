@@ -44,6 +44,8 @@ make_service_spec() ->
                 listen_port => app_config(listen_port),
                 listen_path => app_config(listen_path),
                 listen_secure => app_config(listen_secure) },
+
+    io:format("config: ~p~n", [Config]),
     case nkprometheus_util:parse_exporter(Config) of 
         {ok, Exporter} ->
             #{ id => nkprometheus,
@@ -51,7 +53,7 @@ make_service_spec() ->
                rest_url => rest_url(Exporter),
                debug => []};
         {error, Error} ->
-            lager:warning("Invalid prometheus exporter configuration ~p: ~p", [Error]),
+            lager:warning("Invalid prometheus exporter configuration: ~p", [Error]),
             error(invalid_service_syntax)
     end.
     
