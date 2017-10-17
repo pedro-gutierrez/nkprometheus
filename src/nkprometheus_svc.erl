@@ -37,7 +37,7 @@ start_exporter(#{ id := SrvId } = Spec) ->
     end.
 
 app_config(Key, Default) ->
-    application:get_env(Key, Default).
+    application:get_env(nkprometheus, Key, Default).
 
 make_service_spec() ->
     #{ id => nkprometheus, 
