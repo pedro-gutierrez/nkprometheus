@@ -24,7 +24,7 @@
 -define(APP, nkprometheus).
 
 start(_StartType, _StartArgs) ->
-    Syntax = nkprometheus_util:endpoints_syntax(),
+    Syntax = nkprometheus_util:exporter_syntax(),
     case nklib_config:load_env(?APP, Syntax) of
         {ok, _} ->
             {ok, Pid} = nkprometheus_sup:start_link(),
