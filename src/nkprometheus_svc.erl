@@ -19,11 +19,11 @@
 %% -------------------------------------------------------------------
 -module(nkprometheus_svc).
 -export([start_services/1]).
-
+-define(SRV, nkprometheus).
 
 start_services(_) ->
-    Exporters = make_service_spec(),
-    lists:foreach(fun start_exporter/1, Exporters).
+    Exporter = make_service_spec(),
+    start_exporter(Exporter).
 
 start_exporter(#{ id := SrvId } = Spec) ->
     case nkservice:start(SrvId, Spec) of
@@ -38,28 +38,15 @@ start_exporter(#{ id := SrvId } = Spec) ->
     end.
 
 make_service_spec() ->
-    lists:map(fun(#{ id := SrvId} = Exporter) ->
-                      #{ id => SrvId,
-                         name => SrvId,
-                         class => nkprometheus,
-                         callback => nkprometheus_callbacks,
-                         debug => [nkservice_rest],
-                         rest_url => rest_url(Exporter)
-                       }
-              end, exporters()).
+    #{ id => ?SRV, 
+       callback => nkprometheus_callbacks,
+       rest_url => rest_url(nkprometheus_app:get(listen_ip, <<"0.0.0.0">>),
+                            nkprometheus_app:get(listen_port, 8081),
+                            nkprometheus_app:get(listen_path, <<"/metrics">>),
+                            nkprometheus_app:get(listen_secure, false)),
+       debug => []}.
 
-rest_url(#{listen_ip := Host,
-           listen_port := Port,
-           listen_path := Path,
-           listen_secure := Secure}) ->
+rest_url(Host, Port, Path, Secure) ->
     BinPort = nklib_util:to_binary(Port),
     Http1 = case Secure of true -> <<"https">>; false -> <<"http">> end,
     <<Http1/binary, "://", Host/binary, ":", BinPort/binary, Path/binary>>.
-
-exporters() ->
-    %nkprometheus_app:get(exporters).
-    [#{id => nkprometheus_exporter,
-        listen_ip => <<"0.0.0.0">>,
-      listen_port => 9700,
-      listen_path => <<"/metrics">>,
-      listen_secure => false }].
