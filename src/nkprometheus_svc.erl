@@ -37,7 +37,10 @@ start_exporter(#{ id := SrvId } = Spec) ->
     end.
 
 app_config(Key) ->
-    application:get_env(nkprometheus, Key).
+    case application:get_env(nkprometheus, Key) of
+        {ok, Value} -> Value;
+        _ -> undefined
+    end.
 
 make_service_spec() ->
     Config = #{ listen_path => app_config(listen_ip),
