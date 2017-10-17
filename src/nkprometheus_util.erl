@@ -18,22 +18,26 @@
 %%
 %% -------------------------------------------------------------------
 -module(nkprometheus_util).
--export([endpoints_syntax/0, endpoint_syntax/0]).
+-export([exporter_syntax/0, 
+        parse_exporter/1]).
 
-endpoints_syntax() -> 
-    #{ endpoints => {list, endpoint_syntax()},
-       '__defaults' => #{
-         endpoints => []
-        }}.
-
-endpoint_syntax() ->
+exporter_syntax() ->
     #{ listen_ip => host,
        listen_port => {integer, 1, 65535},
        listen_path => basepath,
        listen_secure => boolean,
-       push_server => binary,
        '__defaults' => #{
          listen_ip => <<"127.0.0.1">>,
          listen_port => 8081,
-         listen_path => <<"/metrics">> }
+         listen_path => <<"/metrics">>,
+         listen_secure => false 
+        }
      }.
+
+parse_exporter(Data) ->
+    case nklib_syntax:parse(Data, exporter_syntax()) of
+        {ok, Exporter, _} ->
+            {ok, Exporter};
+        {error, Error} ->
+            {error, Error}
+    end.

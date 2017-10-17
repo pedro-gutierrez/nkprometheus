@@ -36,19 +36,29 @@ start_exporter(#{ id := SrvId } = Spec) ->
             error(service_start_error)
     end.
 
-app_config(Key, Default) ->
-    application:get_env(nkprometheus, Key, Default).
+app_config(Key) ->
+    application:get_env(nkprometheus, Key).
 
 make_service_spec() ->
-    #{ id => nkprometheus, 
-       callback => nkprometheus_callbacks,
-       rest_url => rest_url(app_config(listen_ip, <<"0.0.0.0">>),
-                            app_config(listen_port, 8081),
-                            app_config(listen_path, <<"/metrics">>),
-                            app_config(listen_secure, false)),
-       debug => []}.
-
-rest_url(Host, Port, Path, Secure) ->
+    Config = #{ listen_path => app_config(listen_ip),
+                listen_port => app_config(listen_port),
+                listen_path => app_config(listen_path),
+                listen_secure => app_config(listen_secure) },
+    case nkprometheus_util:parse_exporter(Config) of 
+        {ok, Exporter} ->
+            #{ id => nkprometheus,
+               callback => nkprometheus_callbacks,
+               rest_url => rest_url(Exporter),
+               debug => []};
+        {error, Error} ->
+            lager:warning("Invalid prometheus exporter configuration ~p: ~p", [Error]),
+            error(invalid_service_syntax)
+    end.
+    
+rest_url(#{ listen_ip := Host, 
+            listen_port := Port, 
+            listen_path := Path, 
+            listen_secure := Secure}) ->
     BinPort = nklib_util:to_binary(Port),
     Http1 = case Secure of true -> <<"https">>; false -> <<"http">> end,
     <<Http1/binary, "://", Host/binary, ":", BinPort/binary, Path/binary>>.
